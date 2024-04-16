@@ -1,9 +1,9 @@
 import fs from 'fs';
-import {readFile} from 'fs/promises';
+import {writeFile, readFile} from 'fs/promises';
 import csv from 'csv-parser';
+import {createObjectCsvWriter} from 'csv-writer';
 import fetch from 'node-fetch';
-
-const SUPPORTED_LNGS = ['en', 'ru', 'kz', 'id', 'de'];
+import {SUPPORTED_LNGS} from './index.mjs';
 
 const readCSVFile = async (filePath) => {
     const results = [];
@@ -65,7 +65,7 @@ export const postLocale = async ({token, baseUrl, module, lang, data}) => {
     }
 };
 
-const readJsonFile = async (filePath) => {
+export const readJsonFile = async (filePath) => {
     const data = await readFile(filePath, 'utf8');
     return JSON.parse(data);
 };
@@ -83,3 +83,34 @@ export const uploadLocalizations = async ({token, baseUrl, module}) => {
         await postLocale({token, baseUrl, module, data, lang});
     }
 };
+
+export const downloadGoogleSheetAsCsv = async (spreadSheetId, sheet_name, filePath) => {
+    const url = `https://docs.google.com/spreadsheets/d/${spreadSheetId}/gviz/tq?tqx=out:csv&sheet=${sheet_name}`;
+
+    const response = await fetch(url);
+    const csvData = await response.text();
+    await writeFile(filePath, csvData);
+};
+
+export const handleCsvFile = (inputFilePath, outputFilePath) => new Promise(resolve => {
+    const results = [];
+
+    fs.createReadStream(inputFilePath)
+        .pipe(csv())
+        .on('data', (data) => {
+            delete data['env'];
+            delete data['project'];
+            results.push(data);
+        })
+        .on('end', () => {
+            const csvWriter = createObjectCsvWriter({
+                path: outputFilePath,
+                header: Object.keys(results[0]).map(key => ({id: key, title: key})),
+            });
+
+            csvWriter.writeRecords(results).then(() => {
+                console.log('Файл успешно записан.');
+                resolve();
+            });
+        });
+});
