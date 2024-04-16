@@ -4,8 +4,6 @@ install node (v14 and above) and npm
 npm install
 ```
 
-after uncommenting necessary functions in `index.mjs`
-
 ```shell
 npm run start
 ```
