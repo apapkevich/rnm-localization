@@ -21,11 +21,13 @@ const MODULE =  'chatbot';
 */
 
 export const SUPPORTED_LNGS = ['en', 'ru', 'kz', 'id', 'de'];
+// export const SUPPORTED_LNGS = ['en', 'ru', 'kz'];
 // CHANGE TOKEN
-const TOKEN = '';
+// const TOKEN = ''
 
 const BASE_URL = 'https://dms.dar-dev.zone'; // DEV
 // const BASE_URL = 'https://dms.dar-qa.zone'; // QA
+// const BASE_URL = 'https://stage-dms.dar-qa.zone' // STAGE
 // const BASE_URL = 'https://dms.dar.io'; // PREPROD
 // const BASE_URL = 'https://app.darlean.kz'; // PROD http://app.darlean.kz , http://app.darlean.id , http://app.darlean.com
 
@@ -45,5 +47,5 @@ const uploadParams = {
     await downloadGoogleSheetAsCsv(SPREADSHEET_ID, SHEET_NAME, UNHANDLED_CSV_PATH);
     await handleCsvFile(UNHANDLED_CSV_PATH, CSV_PATH);
     await readCsvAndCreateJsonLocales(generateJsonParams);
-    // await uploadLocalizations(uploadParams);
+    await uploadLocalizations(uploadParams);
 })();
